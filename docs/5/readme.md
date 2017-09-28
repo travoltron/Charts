@@ -743,8 +743,11 @@ It works the same way, but expects a different response:
 
 ```json
 {
-    'dataset1': [1, 2, 3, 4],
-    'dataset2': [4, 3, 2, 1]
+    'labels' => ['test1', 'test2', 'test3', 'test4'],
+    'values' => [
+        'dataset1': [1, 2, 3, 4],
+        'dataset2': [4, 3, 2, 1]
+    ]
 }
 ```
 
