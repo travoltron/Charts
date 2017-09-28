@@ -686,7 +686,7 @@ a URL with ajax.
 
 Example Response from ```/api/data-url```
 ```json
-{labels: ['test1', 'test2', 'test3', 'test4'], values: [1, 2, 3, 4]}
+{"labels": ["test1", "test2", "test3", "test4"], "values": [1, 2, 3, 4]}
 ```
 
 ```php
@@ -714,7 +714,7 @@ Charts::url(url('/api/data-url'), 'line', 'highcharts');
     $values_name = 'values2';
     ```
     ```json
-    {labels: ['test1', 'test2', 'test3', 'test4'], values2: [1, 2, 3, 4]}
+    {"labels": ["test1", "test2", "test3", "test4"], "values2": [1, 2, 3, 4]}
     ```
 
 -   labelsName(required string $labels_name)
@@ -726,7 +726,7 @@ Charts::url(url('/api/data-url'), 'line', 'highcharts');
     $labels_name = 'labels2';
     ```
     ```json
-    {labels2: ['test1', 'test2', 'test3', 'test4'], values: [1, 2, 3, 4]}
+    {"labels2": ["test1", "test2", "test3", "test4"], "values": [1, 2, 3, 4]}
     ```
 
 -   loadingText(required string $loading_text)
@@ -743,10 +743,10 @@ It works the same way, but expects a different response:
 
 ```json
 {
-    'labels' => ['test1', 'test2', 'test3', 'test4'],
-    'values' => [
-        'dataset1': [1, 2, 3, 4],
-        'dataset2': [4, 3, 2, 1]
+    "labels' => ["test1", "test2", "test3", "test4"],
+    "values" => [
+        "dataset1": [1, 2, 3, 4],
+        "dataset2": [4, 3, 2, 1]
     ]
 }
 ```
