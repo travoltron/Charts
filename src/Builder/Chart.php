@@ -10,7 +10,7 @@
 
 namespace ConsoleTVs\Charts\Builder;
 
-use View;
+use Illuminate\Support\Facades\View;
 use ConsoleTVs\Support\Helpers;
 use ConsoleTVs\Charts\Traits\Setters;
 
