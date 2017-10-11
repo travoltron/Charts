@@ -211,20 +211,22 @@ class Database extends Chart
         $labels = [];
         $values = [];
 
-        $day = $day ? $day : date('d');
-        $month = $month ? $month : date('m');
-        $year = $year ? $year : date('Y');
+        $format = 'd-m-Y H:00:00';
+        Date::setLocale($this->language);
 
-        for ($i = 0; $i < 24; $i++) {
-            $hour = ($i < 10) ? "0$i" : "$i";
+        $day = $day ?: date('d');
+        $month = $month ?: date('m');
+        $year = $year ?: date('Y');
 
-            $date_get = $fancy ? $this->hour_format : 'd-m-Y H:00:00';
+        $begin = (new Date('00:00:00'))->setDate($year, $month, $day);
+        $end = (clone $begin)->modify('+1 day');
 
-            Date::setLocale($this->language);
-            $label = ucfirst(Date::create($year, $month, $day, $hour)->format($date_get));
+        $daterange = new \DateInterval($begin, new \DateInterval('PT1H'), $end);
+        foreach ($daterange as $date) {
 
-            $checkDate = "$year-$month-$day $hour:00:00";
-            $value = $this->getCheckDateValue($checkDate, 'Y-m-d H:00:00', $label);
+            $label = ucfirst($date->format($fancy ? $this->hour_format : $format));
+
+            $value = $this->getCheckDateValue($date, $format, $label);
 
             array_push($labels, $label);
             array_push($values, $value);
@@ -249,22 +251,21 @@ class Database extends Chart
         $labels = [];
         $values = [];
 
-        $month = $month ? $month : date('m');
-        $year = $year ? $year : date('Y');
-
-        $days = date('t', strtotime("$year-$month-01"));
-
+        $format = 'd-m-Y';
         Date::setLocale($this->language);
 
-        for ($i = 1; $i <= $days; $i++) {
-            $day = ($i < 10) ? "0$i" : "$i";
+        $month = $month ?: date('m');
+        $year = $year ?: date('Y');
 
-            $date_get = $fancy ? $this->date_format : 'd-m-Y';
+        $begin = (new Date('00:00:00'))->setDate($year, $month, 1);
+        $end = (clone $begin)->modify('+1 month');
 
-            $label = ucfirst(Date::create($year, $month, $day)->format($date_get));
+        $daterange = new \DatePeriod($begin, new \DateInterval('P1D'), $end);
+        foreach ($daterange as $date) {
 
-            $checkDate = "$year-$month-$day";
-            $value = $this->getCheckDateValue($checkDate, 'Y-m-d', $label);
+            $label = ucfirst($date->format($fancy ? $this->date_format : $format));
+
+            $value = $this->getCheckDateValue($date, $format, $label);
 
             array_push($labels, $label);
             array_push($values, $value);
@@ -278,7 +279,7 @@ class Database extends Chart
     /**
      * Group the data monthly based on the creation date.
      *
-     * @param int  $year
+     * @param int $year
      * @param bool $fancy
      *
      * @return Database
@@ -288,22 +289,22 @@ class Database extends Chart
         $labels = [];
         $values = [];
 
-        $year = $year ? $year : date('Y');
-
+        $format = 'm-Y';
         Date::setLocale($this->language);
 
-        for ($i = 1; $i <= 12; $i++) {
-            $month = ($i < 10) ? "0$i" : "$i";
+        $year = $year ?: date('Y');
 
-            $date_get = $fancy ? $this->month_format : 'm-Y';
+        $begin = (new Date('00:00:00'))->setDate($year, 1, 1);
+        $end = (clone $begin)->modify('+1 year');
 
-            $label = ucfirst(Date::create($year, $month)->format($date_get));
+        $daterange = new \DatePeriod($begin, new \DateInterval('P1M'), $end);
+        foreach ($daterange as $date) {
+
+            $label = ucfirst($date->format($fancy ? $this->month_format : $format));
+
+            $value = $this->getCheckDateValue($date, $format, $label);
 
             array_push($labels, $label);
-
-            $checkDate = "$year-$month";
-            $value = $this->getCheckDateValue($checkDate, 'Y-m', $label);
-
             array_push($values, $value);
         }
 
@@ -325,14 +326,16 @@ class Database extends Chart
         $labels = [];
         $values = [];
 
+        $format = 'Y';
+        $today = new Date();
+
         for ($i = 0; $i < $number; $i++) {
-            $year = ($i == 0) ? date('Y') : date('Y', strtotime('-'.$i.' Year'));
+            $date = (clone $today)->modify('-' . $i . ' years');
 
-            array_push($labels, $year);
+            $label = $date->format($format);
+            $value = $this->getCheckDateValue($date, $format, $label);
 
-            $checkDate = $year;
-            $value = $this->getCheckDateValue($checkDate, 'Y', $year);
-
+            array_push($labels, $label);
             array_push($values, $value);
         }
 
@@ -386,7 +389,7 @@ class Database extends Chart
     /**
      * Group the data based on the latest days.
      *
-     * @param int  $number
+     * @param int $number
      * @param bool $fancy
      *
      * @return Database
@@ -396,14 +399,18 @@ class Database extends Chart
         $labels = [];
         $values = [];
 
+        $format = 'd-m-Y';
         Date::setLocale($this->language);
 
+        $today = new Date();
         for ($i = 0; $i < $number; $i++) {
-            $date = $i == 0 ? date('d-m-Y') : date('d-m-Y', strtotime("-$i Day"));
-            $dt = strtotime($date);
-            $date_f = $fancy ? ucfirst(Date::create(date('Y', $dt), date('m', $dt), date('d', $dt))->format($this->date_format)) : $date;
-            array_push($labels, $date_f);
-            $value = $this->getCheckDateValue($date, 'd-m-Y', $date_f);
+            $date = (clone $today)->modify('-' . $i . ' days');
+
+            $label = ucfirst($date->format($fancy ? $this->date_format : $format));
+
+            $value = $this->getCheckDateValue($date, $format, $label);
+
+            array_push($labels, $label);
             array_push($values, $value);
         }
 
@@ -416,7 +423,7 @@ class Database extends Chart
     /**
      * Group the data based on the latest months.
      *
-     * @param int  $number
+     * @param int $number
      * @param bool $fancy
      *
      * @return Database
@@ -425,31 +432,20 @@ class Database extends Chart
     {
         $labels = [];
         $values = [];
-        $previousDate = null;
-        $day = 1;
 
+        $format = 'm-Y';
         Date::setLocale($this->language);
 
+        $today = (new Date())->modify('fist day of month');
         for ($i = 0; $i < $number; $i++) {
-            $date = $i == 0 ? date('m-Y') : date('m-Y', strtotime("-$i Month"));
+            $date = (clone $today)->modify('-' . $i . ' months');
 
-            // If the previous date equals the newly calculated date, move the interval by a day and try again.
-            // @see edge case 29th of March to 29th of February and 31-03-2017 to 30-11-2016. Put a limit just in case
-            // it breaks something.
-            while ($date == $previousDate && $day < 4) {
-                $date = $i == 0 ? date('m-Y', time() - $day * 86400) : date('m-Y', strtotime("-$i Month") - 86400 * $day);
-                $day++;
-            }
-            $dt = strtotime("01-$date");
-            $date_f = $fancy ? ucfirst(Date::create(date('Y', $dt), date('m', $dt), date('d', $dt))->format($this->month_format)) : $date;
-            array_push($labels, $date_f);
+            $label = ucfirst($date->format($fancy ? $this->month_format : $format));
 
-            $value = $this->getCheckDateValue($date, 'm-Y', $date_f);
+            $value = $this->getCheckDateValue($date, $format, $label);
+
+            array_push($labels, $label);
             array_push($values, $value);
-
-            // Set the checks for the next round.
-            $previousDate = $date;
-            $day = 1;
         }
 
         $this->labels(array_reverse($labels));
@@ -473,26 +469,27 @@ class Database extends Chart
     /**
      * This is a simple value generator for the three types of summations used in this Chart object when sorted via data.
      *
-     * @param string $checkDate - a string in the format 'Y-m-d H:ii::ss' Needs to resemble up with $formatToCheck to work
+     * @param \DateTimeInterface $checkDate - a string in the format 'Y-m-d H:ii::ss' Needs to resemble up with $formatToCheck to work
      * @param string $formatToCheck - a string in the format 'Y-m-d H:ii::ss' Needs to resemble up with $checkDate to work
      * @param string $label
      * @return mixed
      */
-    private function getCheckDateValue($checkDate, $formatToCheck, $label)
+    private function getCheckDateValue(\DateTimeInterface $checkDate, $formatToCheck, $label)
     {
         $date_column = $this->date_column;
         $data = $this->data;
+
+        $filter_function = function ($value) use ($checkDate, $date_column, $formatToCheck) {
+            return $checkDate->format($formatToCheck) == (new \DateTimeImmutable($value->$date_column))->format($formatToCheck);
+        };
+
         if ($this->preaggregated) {
             // Since the column has been preaggregated, we only need one record that matches the search
-            $valueData = $data->first(function ($value) use ($checkDate, $date_column, $formatToCheck) {
-                return $checkDate == date($formatToCheck, strtotime($value->$date_column));
-            });
+            $valueData = $data->first($filter_function);
             $value = $valueData !== null ? $valueData->aggregate : 0;
         } else {
             // Set the data represented. Return the relevant value.
-            $valueData = $data->filter(function ($value) use ($checkDate, $date_column, $formatToCheck) {
-                return $checkDate == date($formatToCheck, strtotime($value->$date_column));
-            });
+            $valueData = $data->filter($filter_function);
 
             if ($valueData !== null) {
                 // Do an aggregation, otherwise count the number of records.
