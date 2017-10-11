@@ -249,40 +249,38 @@ class Builder
      */
     private static function getAssets($libraries = [], $type = [])
     {
+        $assets = config('charts.assets');
+        
         if (! $libraries) {
             $libraries = [];
-            foreach (config('charts.assets') as $key => $value) {
+            foreach ($assets as $key => $value) {
                 array_push($libraries, $key);
             }
         }
-        $assets = config('charts.assets');
-        $final_assets = $assets;
-
+        
         if ($libraries && is_string($libraries)) {
             $libraries = explode(',', $libraries);
         }
 
+        $map = function ($value, $key) use ($libraries) {
+            if (in_array($key, $libraries)) {
+                return $value;
+            }
+            return;
+        }
+       
         if ($type) {
-            $final_assets = collect($assets)->map(function ($value, $key) use ($libraries, $type) {
+            $map =  function ($value, $key) use ($libraries, $type) {
                 if (in_array($key, $libraries) && array_key_exists($type, $value)) {
                     return $value[$type];
-                } else {
-                    return;
                 }
-            })->reject(function ($value) {
-                return $value === null;
-            })->toArray();
-        } else {
-            $final_assets = collect($assets)->map(function ($value, $key) use ($libraries) {
-                if (in_array($key, $libraries)) {
-                    return $value;
-                } else {
-                    return;
-                }
-            })->reject(function ($value) {
-                return $value === null;
-            })->toArray();
+                return;
+            }
         }
+        
+        $final_assets = collect($assets)->map($map)->reject(function ($value) {
+                return $value === null;
+            })->toArray();
 
         // return all libraries
         return static::buildIncludeTags($final_assets);
