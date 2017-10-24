@@ -838,9 +838,9 @@ It works the same way, but expects a different response:
 
     ```php
     // All libraries
-    {!! Charts::styles() !!}
+    {!! Charts::scripts() !!}
     // Only certain libraries
-    {!! Charts::styles(['google', 'material']) !!}
+    {!! Charts::scripts(['google', 'material']) !!}
     ```
 
 - libraries(optional string $type)
