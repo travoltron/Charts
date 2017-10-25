@@ -1042,7 +1042,7 @@ It works the same way, but expects a different response:
   The chart dimensions (shortcut to set width, height with one function).
 
   ```php
-  Charts::create('line', 'highcharts')->height(1000, 500);
+  Charts::create('line', 'highcharts')->dimensions(1000, 500);
   ```
 
 - responsive(required boolean $responsive)
