@@ -17,7 +17,7 @@ return [
         'title' => 'My Cool Chart', // Default chart title.
         'height' => 400, // 0 Means it will take 100% of the division height.
         'width' => 0, // 0 Means it will take 100% of the division width.
-        'responsive' => false, // Not recommended since all libraries have diferent sizes.
+        'responsive' => false, // Not recommended since all libraries have different sizes.
         'background_color' => 'inherit', // The chart division background color.
         'colors' => [], // Default chart colors if using no template is set.
         'one_color' => false, // Only use the first color in all values.
